@@ -10,7 +10,7 @@
 		("-h,--help", "print this help")  //call functor
 		.add(...)
 			(...)
-		.paremt()
+		.parent()
 		(...)
 		(...)
 */

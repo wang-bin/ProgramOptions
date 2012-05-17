@@ -25,7 +25,6 @@ public:
 ezlog_debug("Total root groups: %d", groups.size());
 		list<OptionGroup*>::const_iterator it; 
 		for (it = groups.begin(); it != groups.end(); ++it) {
-ezlog_debug("Printing group... %s", (*it)->description());
 			(*it)->print();
 		}
 	}
@@ -36,8 +35,8 @@ static Private *priv = new Private();
 static void parse_error(const string& msg)
 {
 	cout << "Invalid option: " << msg << endl;
+	cout << "Usage:" << endl;
 	help();
-	exit(0);
 }
 
 OptionGroup& add(const OptionGroup& group)
@@ -126,6 +125,7 @@ AnyBasic get(const char* name)
 void help()
 {
 	priv->print();
+	exit(0);
 }
 
 
@@ -140,8 +140,19 @@ public:
 	AnyBasic value, default_value;
 	std::string description;
 	std::string name, short_name, long_name;
+
+	void init(const char* n, const AnyBasic& def, Type t, const string& desc, OptionGroup* g) {
+		default_value = def;
+		type = t;
+		description = desc;
+		group = g;
+		if (type == NoToken)
+			default_value = false;
+		value = default_value;
+		initNames(n);
+	}
 	// --long_name  -short_name
-	void parseName(const char* s) {
+	void initNames(const char* s) {
 		name = s;
 		//const char *c = strchr(s, ',');
 		size_t c = name.find(',');
@@ -240,7 +251,6 @@ public:
 		depth = 0;
 		OptionGroup *g = p->impl->parent;
 		while (g != 0) {
-ezlog_debug();
 			depth++;
 			g = g->impl->parent;
 		}
@@ -257,7 +267,6 @@ ezlog_debug("depth=%d", g->depth());
 ezlog_debug("options count=%d", options.size());
 		while (it != options.end()) {
 			opt_name_w = std::max(opt_name_w, (int)(*it)->impl->name.size());
-ezlog_debug("w=%d", opt_name_w);
 			++it;
 		}
 //		assert(w <= 0);
@@ -291,55 +300,25 @@ ezlog_debug("w=%d", opt_name_w);
 Option::Option(const char* name, const char* description, OptionGroup* group)
 	:impl(new Impl())
 {
-ezlog_debug();
-	impl->group = group;
-	impl->description = description;
-	impl->parseName(name);
-	impl->type = NoToken;
-	impl->default_value = false;
-	impl->value = false;
-	ezlog_debug("%s %s\n", impl->name.c_str(), impl->description.c_str());
+	impl->init(name, false, NoToken, description, group);
 }
 
 Option::Option(const char* name, const AnyBasic& defaultValue, const char* description, OptionGroup* group) //single token
 	:impl(new Impl())
 {
-ezlog_debug();
-	impl->group = group;
-	impl->description = description;
-	impl->parseName(name);
-	impl->type = SingleToken;
-	impl->default_value = defaultValue;
-	impl->value = defaultValue;
-	ezlog_debug("%s %s\n", impl->name.c_str(), impl->description.c_str());
+	impl->init(name, defaultValue, SingleToken, description, group);
 }
 
 Option::Option(const char* name, const AnyBasic& defaultValue, Type type, const char* description, OptionGroup* group)
 	:impl(new Impl())
 {
-ezlog_debug();
-	impl->group = group;
-	impl->description = description;
-	impl->parseName(name);
-	impl->type = type;
-	impl->default_value = defaultValue;
-	impl->value = defaultValue;
-	ezlog_debug("%s %s\n", impl->name.c_str(), impl->description.c_str());
+	impl->init(name, defaultValue, type, description, group);
 }
 
 Option::Option(const char* name, Type type, const char* description, OptionGroup* group)
 	:impl(new Impl())
 {
-ezlog_debug();
-	impl->group = group;
-	impl->description = description;
-	impl->parseName(name);
-	impl->type = type;
-	if (impl->type == NoToken) {
-		impl->default_value = false;
-		impl->value = false;
-	}
-	ezlog_debug("%s %s\n", impl->name.c_str(), impl->description.c_str());
+	impl->init(name, AnyBasic(), type, description, group);
 }
 
 Option::~Option()
@@ -432,6 +411,7 @@ void Option::setType(Type type)
 //calculate the space for all options
 void Option::print()
 {
+	//TODO: compute in group once
 	int max_name_len = group()->impl->option_name_width();
 	int name_len = impl->name.size();
 ezlog_debug("max len=%d, len=%d", max_name_len, name_len);
@@ -487,7 +467,6 @@ void OptionGroup::print()
 
 OptionGroup& OptionGroup::add(const OptionGroup& g)
 {	
-ezlog_debug();
 	OptionGroup *child = new OptionGroup(/*g.name(), */g.description(), this);
 	impl->childs.push_back(child);
 ezlog_debug();
