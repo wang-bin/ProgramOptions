@@ -1,0 +1,3 @@
+[submodule "ezlog"]
+	path = ezlog
+	url = git@github.com:wang-bin/ezlog.git
