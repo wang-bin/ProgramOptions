@@ -533,6 +533,7 @@ ezlog_debug();
 
 OptionGroup& OptionGroup::operator ()()
 {
+	//FIXME: what if parent is 0(root group)
 	return parent();
 }
 
