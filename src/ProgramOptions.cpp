@@ -465,12 +465,17 @@ void OptionGroup::print()
 	impl->print(this);
 }
 
-OptionGroup& OptionGroup::add(const OptionGroup& g)
+OptionGroup& OptionGroup::operator [](const OptionGroup& g)
 {	
 	OptionGroup *child = new OptionGroup(/*g.name(), */g.description(), this);
 	impl->childs.push_back(child);
 ezlog_debug();
 	return *child;
+}
+
+OptionGroup& OptionGroup::operator ()()
+{
+	return parent();
 }
 
 OptionGroup& OptionGroup::operator ()(const Option& option)

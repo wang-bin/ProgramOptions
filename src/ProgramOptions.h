@@ -76,7 +76,8 @@ public:
 	void print();
 	
 	//call constructor, parent = this. 1 more constructor. return the child group
-	OptionGroup& add(const OptionGroup& group);
+	OptionGroup& operator [](const OptionGroup& group);
+	OptionGroup& operator ()();
 	//call constructor, group = this. 1 more constructor. return this group
 	OptionGroup& operator ()(const Option& option);
 	OptionGroup& operator ()(const char* name, const char* description = 0);//notoken

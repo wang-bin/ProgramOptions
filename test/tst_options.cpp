@@ -8,15 +8,15 @@ int main(int argc, char** argv)
 	ezlog_init_default();
 	po::add("Help for this program")
 		("-h,help", po::NoToken, "show this message")
-		.add("Author info")
+		["Author info"]
 			("-name", "Luke", "the name of author")
 			("--age", 24, "the age of author")
 			("-w,weight", 66.6, "the weight of author")
 			("--height,-H", 175.6, "the height of author")
-			.add("Other infomation")
+			["Other infomation"]
 				("girl", "DLF", "first girl friend")
-			.parent()
-		.parent()
+			()	
+		()
 		
 		("--version,v", "show the library version")
 	;
