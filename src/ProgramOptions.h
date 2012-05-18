@@ -23,8 +23,11 @@ enum Type {
 
 
 class OptionGroup;
+class Summary;
 
-OptionGroup& add(const OptionGroup& group); //parent = null
+Summary& summary(const char* fmt, ...);
+
+OptionGroup& add(const char* group_description); //parent = null
 
 void parse(int argc, const char* const* argv);
 
@@ -33,6 +36,18 @@ AnyBasic get(const char* name); //const //get vaule
 
 void help();
 
+
+class Summary
+{
+public:
+	Summary(const char* text = 0);
+	OptionGroup& operator [](const char* group_description);
+	void setSummary(const char* text);
+	void print();
+private:
+	class Impl;
+	Impl *impl;
+};
 
 class Option
 {

@@ -1,4 +1,5 @@
 #include "ProgramOptions.h"
+#include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -13,6 +14,7 @@ using namespace std;
 
 namespace ProgramOptions {
 
+static Summary *options_summary = new Summary("");
 class Private
 {
 public:
@@ -22,29 +24,85 @@ public:
 	map<string/*long name*/, Option*> long_options;
 	
 	void print() {
+		options_summary->print();
 ezlog_debug("Total root groups: %d", groups.size());
 		list<OptionGroup*>::const_iterator it; 
 		for (it = groups.begin(); it != groups.end(); ++it) {
 			(*it)->print();
+			cout << endl;
 		}
 	}
 };
 
 static Private *priv = new Private();
-//TODO: printf like
-static void parse_error(const string& msg)
+
+class Summary::Impl
 {
+public:
+	void print() {
+		cout << text << endl << endl;
+	}
+	string text;
+};
+
+Summary::Summary(const char* text)
+	:impl(new Impl)
+{
+	impl->text = text;
+}
+
+//create a root group
+OptionGroup& Summary::operator [](const char* group_description)
+{
+	OptionGroup *g = new OptionGroup(group_description, 0);
+	priv->groups.push_back(g);
+	return *g;	
+}
+
+void Summary::setSummary(const char* text)
+{
+	impl->text = text;
+}
+
+void Summary::print()
+{
+	impl->print();
+}
+
+//TODO: printf like
+static void parse_error(const char* fmt, ...)
+{
+	char msg[512];
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(msg, fmt, args);
+        va_end(args);
+
 	cout << "Invalid option: " << msg << endl;
 	cout << "Usage:" << endl;
 	help();
 }
 
-OptionGroup& add(const OptionGroup& group)
+
+
+
+
+	
+Summary& summary(const char* fmt, ...)
 {
-	OptionGroup *g = new OptionGroup(/*group.name(), */group.description());
-	priv->groups.push_back(g);
-	ezlog_debug("%s \n", g->description());
-	return *g;
+	char msg[512];
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(msg, fmt, args);
+        va_end(args);
+	options_summary->setSummary(msg);
+	return *options_summary;
+}
+
+//create a root group
+OptionGroup& add(const char* group_description)
+{
+	return (*options_summary)[group_description];
 }
 
 void parse(int argc, const char* const* argv)
@@ -66,7 +124,7 @@ void parse(int argc, const char* const* argv)
 			if (eq != string::npos) {
 				string long_name = (*it).substr(2, eq - 2);
 				if (priv->long_options.count(long_name) == 0)
-					parse_error(long_name);
+					parse_error(long_name.c_str());
 				opt = priv->long_options[long_name];
 ezlog_debug();
 				if (opt->type() == NoToken) {
@@ -79,28 +137,28 @@ ezlog_debug();
 			} else {
 				string long_name = (*it).substr(2);
 				if (priv->long_options.count(long_name) == 0)
-					parse_error(long_name);
+					parse_error(long_name.c_str());
 				opt = priv->long_options[long_name];
 				if (opt->type() == NoToken) {
 					opt->setValue(true);
 				} else {
 					it = args.erase(it);
 					if ((*it)[0] == '-' || it == args.end())
-						parse_error("Need an value for this option");
+						parse_error("Need an value for this option '--%s'", long_name.c_str());
 					opt->setValue(*it);
 				}
 			}	
 		} else if ((*it).substr(0, 1) == "-") {
 			string short_name = (*it).substr(1);
 			if (priv->short_options.count(short_name) == 0)
-				parse_error(short_name);
+				parse_error(short_name.c_str());
 			opt = priv->short_options[short_name];
 			if (opt->type() == NoToken) {
 				opt->setValue(true);
 			} else {
 				it = args.erase(it);
 				if ((*it)[0] == '-' || it == args.end())
-					parse_error("Need an value for this option");
+					parse_error("Need an value for this option  '-%s'", short_name.c_str());
 				opt->setValue(*it);
 			}
 		}
