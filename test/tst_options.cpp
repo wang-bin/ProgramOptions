@@ -1,4 +1,5 @@
 #include "ProgramOptions.h"
+#include <cstdio>
 #include <iostream>
 using namespace std;
 namespace po = ProgramOptions;
