@@ -5,11 +5,12 @@ An easy to use program options library. something like boost.program_options
 
 
 
-An example:
+Example
+-------
 
 tst_options.cpp
 
-
+<pre>
 #include "ProgramOptions.h"
 #include <iostream>
 using namespace std;
@@ -52,3 +53,4 @@ int main(int argc, char** argv)
 	cout << "girl: " << po::get("girl") << endl;
 	return 0;
 }
+</pre>
