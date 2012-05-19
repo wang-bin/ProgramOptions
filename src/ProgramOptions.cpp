@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "ezlog.h"
 
 using namespace std;
 
@@ -26,7 +25,6 @@ public:
 	
 	void print() {
 		options_summary->print();
-ezlog_debug("Total root groups: %d", groups.size());
 		list<OptionGroup*>::const_iterator it; 
 		for (it = groups.begin(); it != groups.end(); ++it) {
 			(*it)->print();
@@ -127,9 +125,7 @@ void parse(int argc, const char* const* argv)
 				if (priv->long_options.count(long_name) == 0)
 					parse_error(long_name.c_str());
 				opt = priv->long_options[long_name];
-ezlog_debug();
 				if (opt->type() == NoToken) {
-ezlog_debug();
 					opt->setValue(true);
 				}
 				//TODO: MultiToken
@@ -315,7 +311,6 @@ public:
 		}
 	}
 	int offset(OptionGroup *g) {
-ezlog_debug("depth=%d", g->depth());
 		return 2 * g->depth();
 	}
 		
@@ -323,7 +318,6 @@ ezlog_debug("depth=%d", g->depth());
 		if (opt_name_w > 0) //calculate only once
 			return opt_name_w;
 		list<Option*>::const_iterator it = options.begin();
-ezlog_debug("options count=%d", options.size());
 		while (it != options.end()) {
 			opt_name_w = std::max(opt_name_w, (int)(*it)->impl->name.size());
 			++it;
@@ -473,7 +467,6 @@ void Option::print()
 	//TODO: compute in group once
 	int max_name_len = group()->impl->option_name_width();
 	int name_len = impl->name.size();
-ezlog_debug("max len=%d, len=%d", max_name_len, name_len);
 	string offset_space(group()->impl->offset(group()) + 2, ' ');
 	string space_fill_name(max_name_len - name_len, ' ');
 	cout << offset_space << impl->name << space_fill_name << "      " << impl->description;
@@ -539,7 +532,6 @@ OptionGroup& OptionGroup::operator [](const OptionGroup& g)
 		return add(g.description());
 	OptionGroup *child = new OptionGroup(/*g.name(), */g.description(), this);
 	impl->childs.push_back(child);
-ezlog_debug();
 	return *child;
 }
 
@@ -551,7 +543,6 @@ OptionGroup& OptionGroup::operator ()()
 //FIXME: if invalid, add to previous root group. now it will do nothing
 OptionGroup& OptionGroup::operator ()(const Option& option)
 {
-ezlog_debug();
 	if (this == invalid_group)
 		return *invalid_group;
 	Option *p = new Option(option.name(), option.defaultValue(), option.type(), option.description(), this);
@@ -561,7 +552,6 @@ ezlog_debug();
 
 OptionGroup& OptionGroup::operator ()(const char* name, const char* description)
 {
-ezlog_debug();
 	if (this == invalid_group)
 		return *invalid_group;
 
@@ -572,7 +562,6 @@ ezlog_debug();
 
 OptionGroup& OptionGroup::operator ()(const char* name, Type type, const char* description)
 {
-ezlog_debug();
 	if (this == invalid_group)
 		return *invalid_group;
 
@@ -583,7 +572,6 @@ ezlog_debug();
 
 OptionGroup& OptionGroup::operator ()(const char* name, const AnyBasic& defaultValue, const char* description)
 {
-ezlog_debug();
 	if (this == invalid_group)
 		return *invalid_group;
 
@@ -594,7 +582,6 @@ ezlog_debug();
 
 OptionGroup& OptionGroup::operator ()(const char* name, const AnyBasic& defaultValue, Type type, const char* description)
 {
-ezlog_debug();
 	if (this == invalid_group)
 		return *invalid_group;
 

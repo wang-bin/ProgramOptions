@@ -1,11 +1,9 @@
 #include "ProgramOptions.h"
-#include "ezlog.h"
 #include <iostream>
 using namespace std;
 namespace po = ProgramOptions;
 int main(int argc, char** argv)
 {
-	ezlog_init_default();
 	po::summary("It's a demo for ProgramOptions")
 		["Help for this program"]
 		("-h,help", po::NoToken, "show this message")
