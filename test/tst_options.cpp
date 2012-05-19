@@ -18,6 +18,8 @@ int main(int argc, char** argv)
 				("girl", "DLF", "first girl friend")
 				()
 			()()()
+		("--bye", "can you see me?")
+		["Version information"]
 		("--version,v", "show the library version")
 		()
 	;

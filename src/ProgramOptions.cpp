@@ -548,6 +548,7 @@ OptionGroup& OptionGroup::operator ()()
 	return parent();
 }
 
+//FIXME: if invalid, add to previous root group. now it will do nothing
 OptionGroup& OptionGroup::operator ()(const Option& option)
 {
 ezlog_debug();
