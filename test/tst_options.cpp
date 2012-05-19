@@ -16,10 +16,10 @@ int main(int argc, char** argv)
 			("--height,-H", 175.6, "the height of author")
 			["Other infomation"]
 				("girl", "DLF", "first girl friend")
-			()	
-		()
-		
+				()
+			()()()
 		("--version,v", "show the library version")
+		()
 	;
 	po::add("Do you like it?")
 		("-y,--yes", "I like it")

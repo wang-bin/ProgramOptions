@@ -14,6 +14,7 @@ using namespace std;
 
 namespace ProgramOptions {
 
+static OptionGroup *invalid_group = 0;
 static Summary *options_summary = new Summary("");
 class Private
 {
@@ -296,13 +297,13 @@ public:
 class OptionGroup::Impl
 {
 public:
-	Impl():depth(-1) {}
+	Impl():invalid(false),depth(-1) {}
 	OptionGroup *parent;
 	string description;
 	list<OptionGroup*> childs;
 	list<Option*> options;
 	//std::string name, short_name, long_name;	
-	
+	bool invalid;
 	int opt_name_w;
 	int depth;
 	void compute_depth(OptionGroup* p) {
@@ -515,6 +516,15 @@ OptionGroup::~OptionGroup()
 
 OptionGroup& OptionGroup::parent()
 {
+	//printf("parent=%p\n", impl->parent);
+	if (!impl->parent) {
+		if (!invalid_group) {
+			invalid_group = new OptionGroup("");
+			invalid_group->impl->invalid = true;
+		}
+		return *invalid_group;
+	}
+
 	return *impl->parent;
 }
 
@@ -525,6 +535,8 @@ void OptionGroup::print()
 
 OptionGroup& OptionGroup::operator [](const OptionGroup& g)
 {	
+	if (this == invalid_group)
+		return add(g.description());
 	OptionGroup *child = new OptionGroup(/*g.name(), */g.description(), this);
 	impl->childs.push_back(child);
 ezlog_debug();
@@ -533,13 +545,14 @@ ezlog_debug();
 
 OptionGroup& OptionGroup::operator ()()
 {
-	//FIXME: what if parent is 0(root group)
 	return parent();
 }
 
 OptionGroup& OptionGroup::operator ()(const Option& option)
 {
 ezlog_debug();
+	if (this == invalid_group)
+		return *invalid_group;
 	Option *p = new Option(option.name(), option.defaultValue(), option.type(), option.description(), this);
 	impl->addOption(p);
 	return *this;
@@ -548,6 +561,9 @@ ezlog_debug();
 OptionGroup& OptionGroup::operator ()(const char* name, const char* description)
 {
 ezlog_debug();
+	if (this == invalid_group)
+		return *invalid_group;
+
 	Option *p = new Option(name, description, this);
 	impl->addOption(p);
 	return *this;
@@ -556,6 +572,9 @@ ezlog_debug();
 OptionGroup& OptionGroup::operator ()(const char* name, Type type, const char* description)
 {
 ezlog_debug();
+	if (this == invalid_group)
+		return *invalid_group;
+
 	Option *p = new Option(name, type, description, this);
 	impl->addOption(p);
 	return *this;
@@ -564,6 +583,9 @@ ezlog_debug();
 OptionGroup& OptionGroup::operator ()(const char* name, const AnyBasic& defaultValue, const char* description)
 {
 ezlog_debug();
+	if (this == invalid_group)
+		return *invalid_group;
+
 	Option *p = new Option(name, defaultValue, description, this);
 	impl->addOption(p);
 	return *this;
@@ -572,6 +594,9 @@ ezlog_debug();
 OptionGroup& OptionGroup::operator ()(const char* name, const AnyBasic& defaultValue, Type type, const char* description)
 {
 ezlog_debug();
+	if (this == invalid_group)
+		return *invalid_group;
+
 	Option *p = new Option(name, defaultValue, type, description, this);
 	impl->addOption(p);
 	return *this;
