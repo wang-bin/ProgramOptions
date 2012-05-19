@@ -334,7 +334,7 @@ public:
 		options.push_back(p);
 	}
 	void print(OptionGroup* g) {
-		string space(g->impl->offset(g), '*');
+		string space(g->impl->offset(g), '>');
 		cout << space << g->description() << endl; //formated string
 		list<Option*>::const_iterator i;
 		for (i = g->impl->options.begin(); i != g->impl->options.end(); ++i) {
@@ -541,15 +541,6 @@ OptionGroup& OptionGroup::operator ()()
 }
 
 //FIXME: if invalid, add to previous root group. now it will do nothing
-OptionGroup& OptionGroup::operator ()(const Option& option)
-{
-	if (this == invalid_group)
-		return *invalid_group;
-	Option *p = new Option(option.name(), option.defaultValue(), option.type(), option.description(), this);
-	impl->addOption(p);
-	return *this;
-}
-
 OptionGroup& OptionGroup::operator ()(const char* name, const char* description)
 {
 	if (this == invalid_group)

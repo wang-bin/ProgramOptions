@@ -5,12 +5,13 @@
 /*!
   TODO: move Option, OptionGroup to cpp
 
-	ProgramOptions::add("help")
+	ProgramOptions::summary("Summary for this library")
+		["Usage:"]
 		("-V,--version", "version 1.0.0")
-		("-h,--help", "print this help")  //call functor
-		.add(...)
+		("-h,--help", "print this help")
+			["sub group"]
 			(...)
-		.parent()
+			() //parent group
 		(...)
 		(...)
 */
@@ -33,7 +34,7 @@ void parse(int argc, const char* const* argv);
 
 //const AnyBasic& get(const char* name); //const //get vaule
 AnyBasic get(const char* name); //const //get vaule
-
+//template<typename T> T getAs(const char* name);
 void help();
 
 
@@ -52,7 +53,7 @@ private:
 class Option
 {
 public:
-	//Add functor param
+	//TODO: Add functor param
 	Option(const char* name, const char* description, OptionGroup* group = 0);//notoken
 	Option(const char* name, Type type, const char* description, OptionGroup* group = 0);
 	Option(const char* name, const AnyBasic& defaultValue, const char* description, OptionGroup* group = 0); //single token
@@ -65,8 +66,8 @@ public:
 	bool isShortOption() const;
 	const char* longName() const;
 	const char* shortName() const;
-	const char* name() const;
-	const char* description() const;	
+	const char* name() const;  //-short_name,--long_name
+	const char* description() const;
 	AnyBasic value() const;
 	AnyBasic defaultValue() const;
 	void setValue(const AnyBasic& value);
@@ -83,24 +84,26 @@ private:
 class OptionGroup
 {
 public:
-	//OptionGroup(const char* name, const char* description, OptionGroup* parent = 0);
 	OptionGroup(const char* description, OptionGroup* parent = 0); //OptionGroup == 0, use default values
 	~OptionGroup();
 	
 	OptionGroup& parent();
 	void print();
 	
-	//call constructor, parent = this. 1 more constructor. return the child group
+	//return the child group
 	OptionGroup& operator [](const OptionGroup& group);
+	/*!
+	 * return parent group. if parent is null, return an invalid group. you can call it any times. The options after an invalid
+	 * group will be ignored. You must add a option group first immediatly after the invalid group
+	*/
 	OptionGroup& operator ()();
-	//call constructor, group = this. 1 more constructor. return this group
-	OptionGroup& operator ()(const Option& option);
+	//return this group or invalid group. options added after an invalid group will be ignored
 	OptionGroup& operator ()(const char* name, const char* description = 0);//notoken
 	OptionGroup& operator ()(const char* name, Type type, const char* description = 0);
 	OptionGroup& operator ()(const char* name, const AnyBasic& defaultValue, const char* description = 0); //single token
 	OptionGroup& operator ()(const char* name, const AnyBasic& defaultValue, Type type, const char* description = 0);
 	const char* description() const;
-	const char* name() const;  //-s,--long
+	//const char* name() const;  //-s,--long. not supported now
 	
 	int depth();
 private: 
@@ -108,7 +111,6 @@ private:
 	class Impl;
 	Impl *impl;
 };
-
 
 }
 
