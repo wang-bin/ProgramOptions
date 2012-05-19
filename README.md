@@ -10,7 +10,7 @@ Example
 
 tst_options.cpp
 
-<pre>
+<pre><code>
 #include "ProgramOptions.h"
 #include <iostream>
 using namespace std;
@@ -53,4 +53,4 @@ int main(int argc, char** argv)
 	cout << "girl: " << po::get("girl") << endl;
 	return 0;
 }
-</pre>
+</code></pre>
