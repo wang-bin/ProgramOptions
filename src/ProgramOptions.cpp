@@ -123,7 +123,7 @@ void parse(int argc, const char* const* argv)
 			if (eq != string::npos) {
 				string long_name = (*it).substr(2, eq - 2);
 				if (priv->long_options.count(long_name) == 0)
-					parse_error(long_name.c_str());
+					parse_error("--%s", long_name.c_str());
 				opt = priv->long_options[long_name];
 				if (opt->type() == NoToken) {
 					opt->setValue(true);
@@ -134,7 +134,7 @@ void parse(int argc, const char* const* argv)
 			} else {
 				string long_name = (*it).substr(2);
 				if (priv->long_options.count(long_name) == 0)
-					parse_error(long_name.c_str());
+					parse_error("--%s", long_name.c_str());
 				opt = priv->long_options[long_name];
 				if (opt->type() == NoToken) {
 					opt->setValue(true);
@@ -147,8 +147,26 @@ void parse(int argc, const char* const* argv)
 			}	
 		} else if ((*it).substr(0, 1) == "-") {
 			string short_name = (*it).substr(1);
-			if (priv->short_options.count(short_name) == 0)
-				parse_error(short_name.c_str());
+			if (priv->short_options.count(short_name) == 0) {
+				//-abc == -a -b -c
+				int words = (*it).size() - 1;
+				if (words == 1) {
+					parse_error("-%s", short_name.c_str());
+				} else {
+					for (int n = 0; n < words; ++n) {
+						short_name = (*it).substr(n + 1, 1);
+						if (priv->short_options.count(short_name)) {
+							opt = priv->short_options[short_name];
+							if (opt->type() == NoToken)
+								opt->setValue(true);
+							else
+								parse_error((*it).c_str());
+						} else {
+							parse_error((*it).c_str());
+						}
+					}
+				}
+			}			
 			opt = priv->short_options[short_name];
 			if (opt->type() == NoToken) {
 				opt->setValue(true);

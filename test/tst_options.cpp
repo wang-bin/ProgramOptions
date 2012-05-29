@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 			()()()
 		("--bye", "can you see me?")
 		["Version information"]
-		("--version,v", "show the library version")
+		("--version,ver", "show the library version")
 		()
 	;
 	po::add("Do you like it?")
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	po::parse(argc, argv);
 	if (po::get("h"))
 		po::help();
-	if (po::get("v"))
+	if (po::get("ver"))
 		printf("Version 1.0.0\n");
 	printf("name: %s\n", po::get("name").to<std::string>().c_str());
 	cout << "age: " << po::get("age") << endl; //AnyBasic::operator<<()
@@ -38,5 +38,10 @@ int main(int argc, char** argv)
 	cout << "weight: " << w << endl;
 	cout << "height: " << H << endl;
 	cout << "girl: " << po::get("girl") << endl;
+	bool like = po::get("y");
+	if (like)
+		cout << "You like it" << endl;
+	else
+		cout << "You don't like it" << endl;
 	return 0;
 }
