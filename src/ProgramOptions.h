@@ -18,6 +18,7 @@
 #ifndef PROGRAM_OPTIONS_H
 #define PROGRAM_OPTIONS_H
 
+#include <vector>
 #include "AnyBasic.h"
 /*!
   TODO: move Option, OptionGroup to cpp
@@ -35,10 +36,22 @@
 
 namespace ProgramOptions {
 
+/*
+ * type = (Positional + PositionalCount(N)), N == 0 means the count of option is not limited. Otherwise the option must appears exactly N
+ * times.
+ * Sticky: -t123 equals -t 123
+ */
 enum Type {
-	NoToken, SingleToken, MultiToken
+	NoToken = 0, SingleToken = 1, MultiToken = 2, Sticky = 4
+	, Positional = 0xff//put it at the last
 };
 
+template<int N> struct BinaryLength { enum { value = BinaryLength<(N >> 1)>::value + 1}; };
+template<> struct BinaryLength<0> { enum { value = 0}; };
+
+#define PositionalShift ProgramOptions::BinaryLength<ProgramOptions::Positional>::value
+#define PositionalCount(N) (N << PositionalShift)
+#define PositionalCountOfType(type) (type >> PositionalShift)
 
 class OptionGroup;
 class Summary;
@@ -49,7 +62,7 @@ OptionGroup& add(const char* group_description); //parent = null
 
 void parse(int argc, const char* const* argv);
 
-bool has(const char* name); //name appears in input option
+int count(const char* name); //name appears in command line
 //const AnyBasic& get(const char* name); //const //get vaule
 AnyBasic get(const char* name); //const //get vaule
 //template<typename T> T getAs(const char* name);
@@ -86,8 +99,11 @@ public:
 	const char* shortName() const;
 	const char* name() const;  //-short_name,--long_name
 	const char* description() const;
+	int valuesCount() const; //how many values setted by command line
+	std::vector<AnyBasic> values() const; //-Idir1 -Idir2 -llib1 -llib2
 	AnyBasic value() const;
 	AnyBasic defaultValue() const;
+	//setValues, addValue
 	void setValue(const AnyBasic& value);
 	Type type() const;
 	void setType(Type type);

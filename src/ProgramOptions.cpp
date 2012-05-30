@@ -121,6 +121,7 @@ OptionGroup& add(const char* group_description)
 	return (*options_summary)[group_description];
 }
 
+//TODO: parse positional options, sticky options
 void parse(int argc, const char* const* argv)
 {
 	if (argc == 1)
@@ -146,6 +147,7 @@ void parse(int argc, const char* const* argv)
 					opt->setValue(true);
 				}
 				//TODO: MultiToken
+				//TODO: parse MultiToken seperated by comma ',';
 				else //if (opt->type() == Option::SingleToken)
 					opt->setValue((*it).substr(eq + 1)); //store as string
 			} else {
@@ -159,6 +161,7 @@ void parse(int argc, const char* const* argv)
 					it = args.erase(it);
 					if ((*it)[0] == '-' || it == args.end())
 						parse_error("Need an value for this option '--%s'", long_name.c_str());
+					//TODO: parse MultiToken seperated by comma ',';
 					opt->setValue(*it);
 				}
 			}	
@@ -166,6 +169,7 @@ void parse(int argc, const char* const* argv)
 			string short_name = (*it).substr(1);
 			if (priv->short_options.count(short_name) == 0) {
 				//-abc == -a -b -c
+				//TODO: sticky option
 				int words = (*it).size() - 1;
 				if (words == 1) {
 					parse_error("-%s", short_name.c_str());
@@ -191,6 +195,7 @@ void parse(int argc, const char* const* argv)
 				it = args.erase(it);
 				if ((*it)[0] == '-' || it == args.end())
 					parse_error("Need an value for this option  '-%s'", short_name.c_str());
+				//TODO: parse MultiToken seperated by comma ',';
 				opt->setValue(*it);
 			}
 		}
@@ -198,13 +203,27 @@ void parse(int argc, const char* const* argv)
 	}
 }
 
-AnyBasic get(const char* name)
+Option* getOption(const char* name)
 {
 	Option *opt = 0;
 	if (priv->short_options.count(name))
 		opt = priv->short_options[name];
 	else if (priv->long_options.count(name))
 		opt = priv->long_options[name];
+	
+	return opt;
+}
+
+int count (const char* name)
+{
+	Option *opt = getOption(name);
+	return opt->valuesCount();	
+}
+
+
+AnyBasic get(const char* name)
+{
+	Option *opt = getOption(name);
 	
 	if (!opt)
 		return AnyBasic();
@@ -228,6 +247,8 @@ public:
 	OptionGroup *group;
 	Type type;
 	AnyBasic value, default_value;
+	vector<AnyBasic> values; //union { value, values} ?
+	//values.size() == 0: use default_value
 	std::string description;
 	std::string name, short_name, long_name;
 
@@ -472,9 +493,21 @@ const char* Option::description() const
 	return impl->description.c_str();
 }
 
+int Option::valuesCount() const
+{
+	return impl->values.size();
+}
+
+std::vector<AnyBasic> Option::values() const
+{
+	return impl->values;
+}
+
 AnyBasic Option::value() const
 {
-	return impl->value;
+	if (valuesCount() == 0)
+		return impl->default_value;
+	return impl->value; //impl->values[0];
 }
 
 AnyBasic Option::defaultValue() const
@@ -485,6 +518,10 @@ AnyBasic Option::defaultValue() const
 void Option::setValue(const AnyBasic& value)
 {
 	impl->value = value;
+	if (type() == NoToken)
+		impl->values.clear();
+
+	impl->values.push_back(value);
 }
 
 Type Option::type() const

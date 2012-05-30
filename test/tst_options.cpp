@@ -22,6 +22,7 @@ using namespace std;
 namespace po = ProgramOptions;
 int main(int argc, char** argv)
 {
+	cout << PositionalCount(3) << endl;
 	po::summary("It's a demo for ProgramOptions")
 		["Help for this program"]
 		("-h,help", po::NoToken, "show this message")
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
 			("-w,weight", 66.6, "the weight of author")
 			("--height,-H", 175.6, "the height of author")
 			["Other infomation"]
-				("girl", "DLF", "first girl friend")
+				("girls", "DLF", "girls i loved")
 				()
 			()()()
 		("--bye", "can you see me?")
@@ -54,11 +55,11 @@ int main(int argc, char** argv)
 	double H(po::get("H"));
 	cout << "weight: " << w << endl;
 	cout << "height: " << H << endl;
-	cout << "girl: " << po::get("girl") << endl;
-	bool like = po::get("y");
-	if (like)
+	cout << "girls: " << po::count("girls") << endl;
+	if (po::count("y")) {
 		cout << "You like it" << endl;
-	else
+	} else {
 		cout << "You don't like it" << endl;
+	}
 	return 0;
 }
