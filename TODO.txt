@@ -1,0 +1,19 @@
+2 options can not be together
+individual option groups
+action binding
+
+class OptionError
+class OptionValue {
+	store any or AnyBasic
+	template<T> OptionValue(T &)
+	//default value
+
+private:
+	vector<AnyBasic>
+}
+
+cout << OptionValue
+
+
+("-I", OptionValue<vector<string> >()->setDefault(...), ... //template class?
+("l", OptionValue<vector<string> >("default value)->action(), ...
