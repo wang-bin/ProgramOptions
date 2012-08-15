@@ -6,7 +6,7 @@ CONFIG   += console
 CONFIG   -= app_bundle
 
 CONFIG *= programoptions-buildlib
-
+PROJECTROOT = $$PWD/..
 !include(libProgramOptions.pri): error(could not find libProgramOptions.pri)
 
 #src

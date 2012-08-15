@@ -1,4 +1,9 @@
+Move class to seperated headers
+
+-no-* option
+get("-h") get("--help") get("h") get("help")
 2 options can not be together
+
 individual option groups
 action binding
 
