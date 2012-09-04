@@ -39,9 +39,9 @@
 
 
 !isEmpty(LIBPROGRAMOPTIONS_PRI_INCLUDED):error("libProgramOptions.pri already included")
-LIBQDEVICEWATCHER_PRI_INCLUDED = 1
+LIBPROGRAMOPTIONS_PRI_INCLUDED = 1
 
-staticlink = 1  #1 or 0. use static lib or not
+staticlink = 0  #1 or 0. use static lib or not
 LIB_VERSION = 1.0.0 #0.x.y may be wrong for dll
 #QT += network
 
@@ -76,7 +76,15 @@ QMAKE_LFLAGS_RPATH += #will append to rpath dir
 			PRE_TARGETDEPS += $$PROJECT_LIBDIR/$$qtSharedLib($$NAME, $$LIB_VERSION)
 		} else {
 			PRE_TARGETDEPS += $$PROJECT_LIBDIR/$$qtSharedLib($$NAME)
-			unix: QMAKE_RPATHDIR += $$DESTDIR:$$PROJECT_LIBDIR #executable's dir
+# $$[QT_INSTALL_LIBS] and $$DESTDIR will be auto added to rpath
+# Current (sub)project dir is auto added to the first value as prefix. e.g. QMAKE_RPATHDIR = .. ==> -Wl,-rpath,ROOT/..
+# Executable dir search: ld -z origin, g++ -Wl,-R,'$ORIGIN', in makefile -Wl,-R,'$$ORIGIN'
+# Working dir search: "."
+# TODO: for macx. see qtcreator/src/rpath.pri. search exe dir first(use QMAKE_LFLAGS = '$$RPATH_FLAG' $$QMAKE_LFLAGS)
+			unix:!macx {
+				QMAKE_RPATHDIR += $$PROJECT_LIBDIR:\'\$\$ORIGIN\':\'\$\$ORIGIN/lib\':.
+				QMAKE_LFLAGS += -Wl,-z,origin
+			}
 		}
 	}
 } else {
