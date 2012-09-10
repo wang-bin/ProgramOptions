@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "AnyBasic.h"
+#include "programoptions_global.h"
 /*!
   TODO: move Option, OptionGroup to cpp
 
@@ -56,20 +57,20 @@ template<> struct BinaryLength<0> { enum { value = 0}; };
 class OptionGroup;
 class Summary;
 
-Summary& summary(const char* fmt, ...);
+Q_EXPORT Summary& summary(const char* fmt, ...);
 
-OptionGroup& add(const char* group_description); //parent = null
+Q_EXPORT OptionGroup& add(const char* group_description); //parent = null
 
-void parse(int argc, const char* const* argv);
+Q_EXPORT void parse(int argc, const char* const* argv);
 
-int count(const char* name); //name appears in command line
+Q_EXPORT int count(const char* name); //name appears in command line
 //const AnyBasic& get(const char* name); //const //get vaule
-AnyBasic get(const char* name); //const //get vaule
+Q_EXPORT AnyBasic get(const char* name); //const //get vaule
 //template<typename T> T getAs(const char* name);
-void help();
+Q_EXPORT void help();
 
 
-class Summary
+class Q_EXPORT Summary
 {
 public:
 	Summary(const char* text = 0);
@@ -81,7 +82,7 @@ private:
 	Impl *impl;
 };
 
-class Option
+class Q_EXPORT Option
 {
 public:
 	//TODO: Add functor param
@@ -115,7 +116,7 @@ private:
 	Impl *impl;
 };
 
-class OptionGroup
+class Q_EXPORT OptionGroup
 {
 public:
 	OptionGroup(const char* description, OptionGroup* parent = 0); //OptionGroup == 0, use default values
