@@ -11,7 +11,7 @@ isEmpty(BUILD_DIR):BUILD_DIR=$$(BUILD_DIR)
 isEmpty(BUILD_DIR):BUILD_DIR=$$[BUILD_DIR]
 isEmpty(BUILD_DIR):BUILD_IN_SRC = yes
 
-!isEmpty(BUILD_IN_SRC):BUILD_DIR=$$PROJECTROOT/out
+!isEmpty(BUILD_IN_SRC):BUILD_DIR=$$OUT_PWD/../out
 !include(libProgramOptions.pri): error(could not find libProgramOptions.pri)
 
 #src
