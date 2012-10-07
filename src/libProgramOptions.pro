@@ -1,8 +1,7 @@
 TEMPLATE = lib
 
-QT += 
-QT       -= gui
-CONFIG   += console
+QT       =
+CONFIG   += console #exceptions
 CONFIG   -= app_bundle
 
 CONFIG *= programoptions-buildlib
