@@ -19,11 +19,18 @@
 #ifndef LEXICAL_CAST_H
 #define LEXICAL_CAST_H
 
+#define NO_EXCEPTIONS
+#ifndef NO_EXCEPTIONS
 #include <exception>
+#else
+#include <cstdlib>
+#include <iostream>
+#endif //QT_NO_EXCEPTIONS
 #include <sstream>
 
 namespace lexical {
 
+#ifndef NO_EXCEPTIONS
 class bad_cast : public std::exception
 {
 public:
@@ -32,7 +39,7 @@ public:
 		return "bad lexical cast: source type value could not be interpreted as target";
 	}
 };
-
+#endif //NO_EXCEPTIONS
 template<typename Target>
 struct  cast_to {
 	template<typename Source>
@@ -41,8 +48,14 @@ struct  cast_to {
 		s.clear();
 		s.str("");
 		Target result;
-		if ((s << in).fail() || (s >> result).fail())
+		if ((s << in).fail() || (s >> result).fail()) {
+#ifndef NO_EXCEPTIONS
 			throw bad_cast();
+#else
+			std::cerr << "bad lexical cast: source type value could not be interpreted as target" << std::endl;
+			exit(1);
+#endif //NO_EXCEPTIONS
+		}
 		return result;
 	}
 	static Target from(const Target& in) {
@@ -58,8 +71,14 @@ struct cast_to<std::string> {
 		static std::stringstream s;
 		s.clear();
 		s.str("");
-		if ((s << in).fail())
+		if ((s << in).fail()) {
+#ifndef NO_EXCEPTIONS
 			throw bad_cast();
+#else
+			std::cerr << "bad lexical cast: source type value could not be interpreted as target" << std::endl;
+			exit(1);
+#endif //NO_EXCEPTIONS
+		}
 		return s.str();
 	}
 	static std::string from(const std::string& in) {
