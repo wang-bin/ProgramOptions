@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 	if (po::get("ver"))
 		printf("Version 1.0.0\n");
 	printf("name: %s\n", po::get("name").to<std::string>().c_str());
-	cout << "age: " << po::get("age") << endl; //AnyBasic::operator<<()
+    cout << "age: " << po::get("age").to<int>() << endl; //AnyBasic::operator<<()
 	float w = po::get("w");
 	double H(po::get("H"));
 	cout << "weight: " << w << endl;
